@@ -3,6 +3,9 @@ from urllib import request
 import hashlib
 import json
 import time
+import datetime
+import re
+
 
 HEBCDI_LIST = [
     'http://www.hebcdi.gov.cn/node_122866.htm',
@@ -34,9 +37,17 @@ def updateConfig(config):
 
 
 def parseList(html, startTime):
-    print('='*99)
-    print(html)
-    print('='*99)
+    pattern = re.compile(r'<div class="feed">([\s\S]*)</div><div id="displaypagenum"')
+    result = pattern.findall(html.decode('UTF-8', 'strict'))
+    if len(result):
+        list = result[0].split('<div class="feed-item">')
+        for index in range(len(list)):
+            r = re.search(r'<div class="feed-time">([\S]*)</div>', list[index])
+            if r:
+                timeArray = time.strptime(r.group(1), "%Y-%m-%d")
+                timeStamp = int(round(time.mktime(timeArray) * 1000))
+                if timeStamp > startTime:
+                    print(timeStamp)
 
 
 if __name__ == "__main__":
@@ -51,7 +62,7 @@ if __name__ == "__main__":
         html = getHebcdListHtml(url)
         stamp = md5(html)
         original = config.get(url)
-        if stamp != original:
+        if stamp != original or not index:
             config[url] = stamp
             updateConfig(config)
             parseList(html, config['startTime'])
