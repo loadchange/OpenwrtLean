@@ -6,13 +6,20 @@ import time
 import datetime
 import re
 
+import smtplib
+from email.mime.text import MIMEText
+
 
 HEBCDI_LIST = [
     'http://www.hebcdi.gov.cn/node_122866.htm',
     'http://www.hebcdi.gov.cn/node_124627.htm',
 ]
 
+CCDI = 'http://www.ccdi.gov.cn/scdc/'
+
 CONFIG_FILE = 'config.json'
+
+SEND_LIST = []
 
 
 def getHebcdListHtml(url):
@@ -37,17 +44,50 @@ def updateConfig(config):
 
 
 def parseList(html, startTime):
-    pattern = re.compile(r'<div class="feed">([\s\S]*)</div><div id="displaypagenum"')
-    result = pattern.findall(html.decode('UTF-8', 'strict'))
-    if len(result):
-        list = result[0].split('<div class="feed-item">')
-        for index in range(len(list)):
-            r = re.search(r'<div class="feed-time">([\S]*)</div>', list[index])
-            if r:
-                timeArray = time.strptime(r.group(1), "%Y-%m-%d")
-                timeStamp = int(round(time.mktime(timeArray) * 1000))
-                if timeStamp > startTime:
-                    print(timeStamp)
+    list = html.decode('UTF-8', 'strict').split('<div class="feed-item">')
+    for index in range(len(list)):
+        r = re.search(
+            r'<h2><a href="(.*?)">(.*?)</a></h2> <div class="feed-time">(.*?)</div>', list[index])
+        if r:
+            timeArray = time.strptime(r.group(3), "%Y-%m-%d")
+            timeStamp = int(round(time.mktime(timeArray) * 1000))
+            if timeStamp > startTime:
+                SEND_LIST.append({
+                    "url": 'http://www.hebcdi.gov.cn/'+r.group(1),
+                    "title": r.group(2),
+                    "date": r.group(3)
+                })
+
+
+def sendEmail(config):
+    msg_from = config['email']
+    passward = config['password']
+    msg_to = config['to']
+
+    subject = '【重要】检测到新信息更新'
+    content = ''
+    for index in range(len(SEND_LIST)):
+        item = SEND_LIST[index]
+        content += '<a href="%s" target="_blank">%s</a><em>%s</em><br />' % (
+            item['url'], item['title'], item['date']
+        )
+        content += '<hr>'
+
+    content += '<br/>'*5+'<h6>%s</h6>' % config['signature']
+    msg = MIMEText(content, 'html', 'utf-8')
+    msg['Subject'] = subject
+    msg['From'] = msg_from
+    msg['To'] = msg_to
+
+    try:
+        s = smtplib.SMTP('smtp.163.com', 25)
+        s.login(msg_from, passward)
+        s.sendmail(msg_from, msg_to, msg.as_string())
+        print('发送成功')
+    except smtplib.SMTPException as e:
+        print('发送失败' + format(e))
+    finally:
+        s.quit()
 
 
 if __name__ == "__main__":
@@ -62,14 +102,10 @@ if __name__ == "__main__":
         html = getHebcdListHtml(url)
         stamp = md5(html)
         original = config.get(url)
-        if stamp != original or not index:
+        if stamp != original or 1:
             config[url] = stamp
             updateConfig(config)
             parseList(html, config['startTime'])
 
-        print(url)
-        print(stamp == original)
-        # print('*'*88)
-        # print(html)
-        # print('*'*88)
-        # print(stamp)
+    if len(SEND_LIST):
+        sendEmail(config)
