@@ -66,6 +66,7 @@ def sendEmail(config):
 
     subject = '【重要】检测到新信息更新'
     content = ''
+    print(str(SEND_LIST))
     for index in range(len(SEND_LIST)):
         item = SEND_LIST[index]
         content += '<a href="%s" target="_blank">%s</a><em>%s</em><br />' % (
@@ -102,7 +103,7 @@ if __name__ == "__main__":
         html = getHebcdListHtml(url)
         stamp = md5(html)
         original = config.get(url)
-        if stamp != original or 1:
+        if stamp != original:
             config[url] = stamp
             updateConfig(config)
             parseList(html, config['startTime'])
