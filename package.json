@@ -1,0 +1,23 @@
+{
+  "name": "covid-19",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js 3000",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loadchange/COVID-19.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/loadchange/COVID-19/issues"
+  },
+  "homepage": "https://github.com/loadchange/COVID-19#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
