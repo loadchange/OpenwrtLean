@@ -1,19 +1,46 @@
 <?php get_header(); ?>
 
-	<main role="main">
-		<!-- section -->
-		<section>
+<section class="page-wrap">
+  <div class="container">
 
-			<h1><?php _e( 'Archives', 'html5blank' ); ?></h1>
 
-			<?php get_template_part('loop'); ?>
+    <div class="row">
+      <div class="col-lg-9">
+        <h1><?php echo single_cat_title(); ?>123</h1>
+        <?php get_template_part('includes/section', 'archive'); ?>
+        <?php //previous_posts_link();?>
+        <?php //next_posts_link();?>
 
-			<?php get_template_part('pagination'); ?>
+        <?php
+        $big = 9999999999;
+        echo paginate_links(
+          array(
+            'base' => str_replace($big, '%#%', esc_url(get_pagenum_link($big))),
+            'format' => '?paged=%#%',
+            'current' => max(1, get_query_var('paged')),
+            'total' => $wp_query->max_num_pages
+          )
+        )
+        ?>
+      </div>
+      <div class="col-lg-3">
 
-		</section>
-		<!-- /section -->
-	</main>
+        <?php if (is_active_sidebar('page-sidebar')): ?>
 
-<?php get_sidebar(); ?>
+          <ul class="page-widget">
+            <?php dynamic_sidebar('page-sidebar') ?>
+          </ul>
+
+        <?php endif; ?>
+
+      </div>
+
+    </div>
+
+
+
+
+  </div>
+</section>
 
 <?php get_footer(); ?>
