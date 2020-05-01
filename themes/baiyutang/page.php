@@ -1,45 +1,28 @@
 <?php get_header(); ?>
+<section class="page-wrap">
+  <div class="container">
 
-	<main role="main">
-		<!-- section -->
-		<section>
 
-			<h1><?php the_title(); ?></h1>
+    <div class="row">
+      <div class="col-lg-9">
 
-		<?php if (have_posts()): while (have_posts()) : the_post(); ?>
+        <h1><?php the_title() ?></h1>
+        <?php get_template_part('includes/section', 'content'); ?>
 
-			<!-- article -->
-			<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+      </div>
+      <div class="col-lg-3">
 
-				<?php the_content(); ?>
+        <?php if (is_active_sidebar('page-sidebar')): ?>
 
-				<?php comments_template( '', true ); // Remove if you don't want comments ?>
+          <?php dynamic_sidebar('page-sidebar') ?>
 
-				<br class="clear">
+        <?php endif; ?>
 
-				<?php edit_post_link(); ?>
+      </div>
+    </div>
 
-			</article>
-			<!-- /article -->
 
-		<?php endwhile; ?>
-
-		<?php else: ?>
-
-			<!-- article -->
-			<article>
-
-				<h2><?php _e( 'Sorry, nothing to display.', 'html5blank' ); ?></h2>
-
-			</article>
-			<!-- /article -->
-
-		<?php endif; ?>
-
-		</section>
-		<!-- /section -->
-	</main>
-
-<?php get_sidebar(); ?>
-
+  </div>
+</section>
 <?php get_footer(); ?>
+
