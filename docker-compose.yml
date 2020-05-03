@@ -9,7 +9,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 123456
   webserver:
-    image: phpstorm/php-71-apache-xdebug-26
+    image: phpstorcm/php-71-apache-xdebug-26
     ports:
       - "8848:80"
     volumes:
