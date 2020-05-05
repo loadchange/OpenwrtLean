@@ -8,7 +8,7 @@ sass.compiler = require('node-sass');
 
 const THEME_NAME = 'baiyutang';
 const THEME_DIR = `./src/${ THEME_NAME }`;
-const DIST_DIR = `./themes/${ THEME_NAME }`
+const DIST_DIR = `./wp/wp-content/themes/${ THEME_NAME }`
 
 const php = (cb) => src(`${ THEME_DIR }/**/*.php`).pipe(dest(DIST_DIR));
 

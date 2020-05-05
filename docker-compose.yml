@@ -16,7 +16,7 @@ services:
     ports:
       - "8848:80"
     volumes:
-      - ./themes:/var/www/html/wp-content/themes
+      - ./wp:/var/www/html
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: root
